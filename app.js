@@ -10,7 +10,38 @@ const logger = require('morgan');
 app.use(logger('dev'));
 app.use(jsonParser());
 
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/qa');
+
+const db = mongoose.connection;
+
+db.on('error', function(err) {
+    console.error('Connection error: ', err);
+});
+
+db.once('open', function() {
+    console.log('Db connection successful');
+});
+
 app.use('/questions' ,routes);
+
+// catch 404 
+app.use(function(req, res, next) {
+    const err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({
+        error: {
+            message: err.message
+        }
+    });
+});
 
 const port = process.env.PORT || 3000;
 
