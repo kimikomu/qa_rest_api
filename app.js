@@ -17,14 +17,14 @@ mongoose.connect('mongodb://localhost:27017/qa');
 const db = mongoose.connection;
 
 db.on('error', function(err) {
-    console.error('Connection error: ', err);
+    console.error('Connection error:', err);
 });
 
 db.once('open', function() {
     console.log('Db connection successful');
 });
 
-app.use('/questions' ,routes);
+app.use('/questions', routes);
 
 // catch 404 
 app.use(function(req, res, next) {
