@@ -10,6 +10,7 @@ const logger = require('morgan');
 app.use(logger('dev'));
 app.use(jsonParser());
 
+// set up database connection
 const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost:27017/qa');
@@ -24,16 +25,27 @@ db.once('open', function() {
     console.log('Db connection successful');
 });
 
+// set up headers to grant permissions to be used by a web browser
+app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    if(req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'PUT,POST,DELETE');
+        return res.status(200).json({});
+    }
+    next();
+});
+
+// set up routes
 app.use('/questions', routes);
 
-// catch 404 
+// handle errors
 app.use(function(req, res, next) {
     const err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// error handler
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.json({
@@ -43,6 +55,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
+// set up port
 const port = process.env.PORT || 3000;
 
 app.listen(port, function() {
